@@ -12,6 +12,9 @@ services:
       - '../Classes/Mail/*'
       - '../Classes/Traits/*'
 
+  CPSIT\Typo3Mailqueue\Configuration\ExtensionConfiguration:
+    factory: ['CPSIT\Typo3Mailqueue\Configuration\ExtensionConfiguration', 'create']
+
   CPSIT\Typo3Mailqueue\Command\ListQueueCommand:
     tags:
       - name: console.command

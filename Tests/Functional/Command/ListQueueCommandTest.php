@@ -34,7 +34,6 @@ final class ListQueueCommandTest extends TestingFramework\Core\Functional\Functi
 {
     protected array $testExtensionsToLoad = [
         'mailqueue',
-        'typed_extconf',
     ];
 
     protected bool $initializeDatabase = false;

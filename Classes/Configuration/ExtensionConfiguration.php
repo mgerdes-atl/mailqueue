@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace CPSIT\Typo3Mailqueue\Configuration;
 
 use CPSIT\Typo3Mailqueue\Extension;
-use mteu\TypedExtConf;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration as CoreExtensionConfiguration;
 
 /**
  * ExtensionConfiguration
@@ -26,7 +26,6 @@ use mteu\TypedExtConf;
  * @author Elias Häußler <e.haeussler@familie-redlich.de>
  * @license GPL-2.0-or-later
  */
-#[TypedExtConf\Attribute\ExtensionConfig(Extension::KEY)]
 final readonly class ExtensionConfiguration
 {
     /**
@@ -34,9 +33,48 @@ final readonly class ExtensionConfiguration
      * @param positive-int $itemsPerPage
      */
     public function __construct(
-        #[TypedExtConf\Attribute\ExtConfProperty('queue.delayThreshold')]
         public int $queueDelayThreshold = 1800,
-        #[TypedExtConf\Attribute\ExtConfProperty('pagination.itemsPerPage')]
         public int $itemsPerPage = 20,
     ) {}
+
+    public static function create(CoreExtensionConfiguration $extensionConfiguration): self
+    {
+        $queueDelayThreshold = 1800;
+        $itemsPerPage = 20;
+
+        try {
+            $queueDelay = $extensionConfiguration->get(Extension::KEY, 'queue/delayThreshold');
+            if (is_numeric($queueDelay) && (int)$queueDelay > 0) {
+                $queueDelayThreshold = (int)$queueDelay;
+            }
+        } catch (\Throwable) {
+            try {
+                $queueDelay = $extensionConfiguration->get(Extension::KEY, 'queue.delayThreshold');
+                if (is_numeric($queueDelay) && (int)$queueDelay > 0) {
+                    $queueDelayThreshold = (int)$queueDelay;
+                }
+            } catch (\Throwable) {
+            }
+        }
+
+        try {
+            $items = $extensionConfiguration->get(Extension::KEY, 'pagination/itemsPerPage');
+            if (is_numeric($items) && (int)$items > 0) {
+                $itemsPerPage = (int)$items;
+            }
+        } catch (\Throwable) {
+            try {
+                $items = $extensionConfiguration->get(Extension::KEY, 'pagination.itemsPerPage');
+                if (is_numeric($items) && (int)$items > 0) {
+                    $itemsPerPage = (int)$items;
+                }
+            } catch (\Throwable) {
+            }
+        }
+
+        return new self(
+            $queueDelayThreshold,
+            $itemsPerPage,
+        );
+    }
 }
